@@ -25,7 +25,7 @@ local cmp = require("cmp")
 cmp.setup {
     completion = {
         completeopt = "menu,menuone,noinsert",
-        autocomplete = true
+        autocomplete = false
     },
   snippet = {
     expand = function(args)
