@@ -6,5 +6,5 @@ keymap('n', '<leader>ё', ':FloatermToggle<CR>', default_opts)
 keymap('t', '<leader>`', '<C-\\><C-n>:FloatermToggle<CR>', default_opts)
 keymap('t', '<leader>ё', '<C-\\><C-n>:FloatermToggle<CR>', default_opts)
 keymap('t', '<leader><TAB>', '<C-\\><C-n>:FloatermNext<CR>', default_opts)
-
-keymap('n', '<leader>1', ':FloatermNew ctop<CR>', default_opts)
+keymap('n', '<leader><BS>', ':FloatermNew<CR>', default_opts)
+keymap('t', '<leader><BS>', '<C-\\><C-n>:FloatermNew<CR>', default_opts)

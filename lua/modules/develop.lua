@@ -16,13 +16,11 @@ local on_attach = function(client, bufnr)
     keymap(bufnr, "n", "<leader>s", "<cmd>lua vim.lsp.buf.signature_help()<CR>", default_opts)
     keymap(bufnr, "n", "<leader>r", "<cmd>lua vim.lsp.buf.rename()<CR>", default_opts)
     keymap(bufnr, "n", "<leader>i", "<cmd>lua vim.lsp.buf.implementation()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>k", "<cmd>lua vim.lsp.diagnostic.goto_prev { wrap = false }<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>j", "<cmd>lua vim.lsp.diagnostic.goto_next { wrap = false }<CR>", default_opts)
 end
 
 
 local cmp = require("cmp")
-cmp.setup {
+cmp.setup({
     completion = {
         completeopt = "menu,menuone,noinsert",
         autocomplete = false
@@ -63,7 +61,7 @@ cmp.setup {
     { name = "nvim_lsp" },
     { name = "luasnip" },
   },
-}
+})
 
 require("Comment").setup({})
 require("hop").setup { keys = "ghfjdksla" }

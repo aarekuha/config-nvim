@@ -81,6 +81,11 @@ return packer.startup(function(use)
     use 'voldikss/vim-floaterm'
     use 'airblade/vim-gitgutter'
     use 'petobens/poet-v'
+    use 'aklt/plantuml-syntax'
+    use {'rest-nvim/rest.nvim', requires = {
+            { 'nvim-lua/plenary.nvim' },
+        }
+    }
 end)
 
 
