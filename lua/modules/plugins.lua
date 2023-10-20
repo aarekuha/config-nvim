@@ -66,7 +66,11 @@ return packer.startup(function(use)
     use 'hrsh7th/nvim-cmp'
     use 'hrsh7th/cmp-nvim-lsp'
     use 'saadparwaiz1/cmp_luasnip'
-    use 'L3MON4D3/LuaSnip'
+    -- use 'L3MON4D3/LuaSnip'
+    use {
+        'L3MON4D3/LuaSnip',
+        config = function() require('snippets.init') end,
+    }
     use 'nvie/vim-flake8'
     use 'preservim/nerdtree'
     use 'Xuyuanp/nerdtree-git-plugin'
