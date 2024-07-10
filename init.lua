@@ -7,5 +7,5 @@ require "modules.global"
 require "modules.vimspector"
 require "modules.vimvisual"
 require "modules.keymaps"
-require "modules.rest"
 require "modules.floaterm"
+-- require("myplugin").setup()

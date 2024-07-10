@@ -34,6 +34,7 @@ keymap('n', 'x', '"_d<Right>', default_opts)
 keymap('v', 'p', '"_dP', default_opts)
 keymap('v', 'P', '"_dp', default_opts)
 keymap('n', '<leader>u', ":UndotreeToggle<CR>", default_opts)
+keymap('n', '<INS>', ':Git blame<CR>', default_opts)
 
 vim.cmd([[
     let g:VM_maps = {}

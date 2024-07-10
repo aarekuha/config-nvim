@@ -108,11 +108,14 @@ lsp.pyright.setup({
     flags = {
         debounce_text_changes = 150,
     },
-    venvPath = "/home/alex/.cache/pypoetry/virtualenvs",
-    venv = "cyberstudio-batchmq-JMgety6E-py3.11",
+    -- venvPath = "/home/alex/.cache/pypoetry/virtualenvs",
+    -- venv = "cyberstudio-batchmq-JMgety6E-py3.11",
     on_init = function(client)
-        print(vim.env.VIRTUAL_ENV)
-        client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
+        if vim.env.VIRTUAL_ENV ~= nil then
+            client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
+        else
+            client.config.settings.python.pythonPath = "/home/alex/.pyenv/shims/python"
+        end
     end,
 })
 
@@ -126,3 +129,24 @@ lsp.lua_ls.setup{
         }
     }
 }
+
+
+local function compare_to_clipboard()
+  local ftype = vim.api.nvim_eval("&filetype")
+  vim.cmd(string.format([[
+    execute "normal! \"xy"
+    vsplit
+    enew
+    normal! P
+    setlocal buftype=nowrite
+    set filetype=%s
+    diffthis
+    execute "normal! \<C-w>\<C-w>"
+    enew
+    set filetype=%s
+    normal! "xP
+    diffthis
+  ]], ftype, ftype))
+end
+
+vim.keymap.set('v', '<C-d>', compare_to_clipboard)

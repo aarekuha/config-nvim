@@ -43,8 +43,8 @@ return packer.startup(function(use)
     use { "wbthomason/packer.nvim" }
     use { "ellisonleao/gruvbox.nvim" }
     use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }  -- расширенная подсветка синтаксиса
+    use { 'nvim-lua/plenary.nvim' }
     use { 'nvim-telescope/telescope.nvim', requires = {
-            { 'nvim-lua/plenary.nvim' },
             { 'BurntSushi/ripgrep' }
         }
     }  -- замена fzf, ack и многих еще =)
@@ -66,7 +66,6 @@ return packer.startup(function(use)
     use 'hrsh7th/nvim-cmp'
     use 'hrsh7th/cmp-nvim-lsp'
     use 'saadparwaiz1/cmp_luasnip'
-    -- use 'L3MON4D3/LuaSnip'
     use {
         'L3MON4D3/LuaSnip',
         config = function() require('snippets.init') end,
@@ -86,10 +85,7 @@ return packer.startup(function(use)
     use 'airblade/vim-gitgutter'
     use 'petobens/poet-v'
     use 'aklt/plantuml-syntax'
-    use {'rest-nvim/rest.nvim', requires = {
-            { 'nvim-lua/plenary.nvim' },
-        }
-    }
+    use 'weirongxu/plantuml-previewer.vim'
+    use 'previm/previm'
+    use 'tyru/open-browser.vim'
 end)
-
-
