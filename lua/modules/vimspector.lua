@@ -1,7 +1,6 @@
-vim.cmd([[
-    let g:vimspector_enable_mappings = 'HUMAN'
-    let g:vimspector_install_gadgets = [ 'debugpy' ]
-    let g:vimspector_enable_mappings
-    nmap <leader>q :VimspectorReset<CR>
-    nmap <leader>v <Plug>VimspectorBalloonEval
-]])
+vim.g.vimspector_enable_mappings = 'HUMAN'
+local default_opts = { noremap = false, silent = true }
+local keymap = vim.api.nvim_set_keymap
+keymap('n', '<F6>', ':VimspectorReset<CR>', default_opts)
+keymap('n', '<F7>', '<Plug>VimspectorBalloonEval', default_opts)
+keymap('n', '<F8>', '<Plug>VimspectorRunToCursor', default_opts)

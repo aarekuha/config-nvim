@@ -56,3 +56,4 @@ vim.opt.listchars:append({ space = "·", eol = "$" })
 
 vim.g.NERDTreeQuitOnOpen = 1
 vim.g.NERDTreeShowHidden = 1
+vim.g.NERDTreeWinSize = 60

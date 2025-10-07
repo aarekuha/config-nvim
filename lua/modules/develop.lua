@@ -1,22 +1,81 @@
+local vim = _G.vim
+
+require("mason").setup()
+
+require("mason-lspconfig").setup({
+  ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- свои сервера сюда
+  automatic_installation = true,
+  handlers = {
+    -- дефолт для всех серверов
+    function(server)
+      require("lspconfig")[server].setup({})
+    end,
+
+    -- пример точечной настройки
+    lua_ls = function()
+      require("lspconfig").lua_ls.setup({
+        settings = {
+          Lua = { diagnostics = { globals = { "vim" } } }
+        }
+      })
+    end,
+  },
+})
+
+local function _unique_locs(locs)
+  local seen, out = {}, {}
+  for _, loc in ipairs(locs) do
+    local uri = loc.uri or loc.targetUri
+    local range = (loc.range or loc.targetSelectionRange or loc.targetRange).start
+    local key = string.format("%s:%d:%d", uri, range.line, range.character)
+    if not seen[key] then
+      seen[key] = true
+      table.insert(out, loc)
+    end
+  end
+  return out
+end
+
+local function goto_def_unique()
+  local pos = vim.api.nvim_win_get_cursor(0)
+  local params = {
+    textDocument = vim.lsp.util.make_text_document_params(0),
+    position = { line = pos[1] - 1, character = pos[2] },
+  }
+  vim.lsp.buf_request(0, "textDocument/definition", params, function(err, result, ctx, _)
+    if err or not result then return end
+    local locs = vim.islist(result) and result or { result }
+    locs = _unique_locs(locs)
+    local enc = (vim.lsp.get_client_by_id(ctx.client_id) or {}).offset_encoding or "utf-16"
+    if #locs == 1 then
+      vim.lsp.util.show_document(locs[1], enc, { focus = true })
+    else
+      vim.lsp.util.set_qflist(vim.lsp.util.locations_to_items(locs, enc))
+      vim.cmd("copen")
+    end
+  end)
+end
+
 require("neodev").setup({
     library = {
         enabled = true,
     },
-    lspconfig = true,
 })
 
-local default_opts = { noremap = true, silent = true }
-
-local on_attach = function(client, bufnr)
-    local keymap = vim.api.nvim_buf_set_keymap
-    keymap(bufnr, "n", "<leader>D", "<cmd>lua vim.lsp.buf.declaration()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>d", "<cmd>lua vim.lsp.buf.definition()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>n", "<cmd>lua vim.lsp.buf.references()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>k", "<cmd>lua vim.lsp.buf.hover()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>s", "<cmd>lua vim.lsp.buf.signature_help()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>r", "<cmd>lua vim.lsp.buf.rename()<CR>", default_opts)
-    keymap(bufnr, "n", "<leader>i", "<cmd>lua vim.lsp.buf.implementation()<CR>", default_opts)
-end
+vim.api.nvim_create_autocmd("LspAttach", {
+   group = vim.api.nvim_create_augroup("user.lsp.keys", {}),
+   callback = function(ev)
+     local opts = { buffer = ev.buf, noremap = true, silent = true }
+     local map = function(lhs, rhs) vim.keymap.set("n", lhs, rhs, opts) end
+     map("<leader>D", vim.lsp.buf.declaration)
+     map("<leader>d", goto_def_unique)
+     map("<leader>n", vim.lsp.buf.references)
+     map("<leader>k", vim.lsp.buf.hover)
+     map("<leader>s", vim.lsp.buf.signature_help)
+     map("<leader>r", vim.lsp.buf.rename)
+     map("<leader>i", vim.lsp.buf.implementation)
+   end,
+})
 
 local has_words_before = function()
   unpack = unpack or table.unpack
@@ -87,49 +146,36 @@ cmp.setup({
 require("Comment").setup({})
 require("hop").setup { keys = "ghfjdksla" }
 
-local capabilities = vim.lsp.protocol.make_client_capabilities()
-capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
-capabilities.offsetEncoding = "utf-8"
-
-local lsp = require("lspconfig")
-
-lsp.clangd.setup({
-    on_attach=on_attach,
-    capabilities = capabilities,
+vim.lsp.config("*", {
+   capabilities = require("cmp_nvim_lsp").default_capabilities(),
 })
 
-lsp.ccls.setup{
-    on_attach=on_attach,
-    capabilities = capabilities,
-}
+vim.lsp.config("clangd", {})
+vim.lsp.config("ccls", {})
 
-lsp.pyright.setup({
-    on_attach = on_attach,
-    flags = {
-        debounce_text_changes = 150,
-    },
-    -- venvPath = "/home/alex/.cache/pypoetry/virtualenvs",
-    -- venv = "cyberstudio-batchmq-JMgety6E-py3.11",
-    on_init = function(client)
-        if vim.env.VIRTUAL_ENV ~= nil then
-            client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
-        else
-            client.config.settings.python.pythonPath = "/home/alex/.pyenv/shims/python"
-        end
-    end,
+vim.lsp.config("pyright", {
+   flags = { debounce_text_changes = 150 },
+   on_init = function(client)
+     client.config.settings = client.config.settings or {}
+     client.config.settings.python = client.config.settings.python or {}
+     if vim.env.VIRTUAL_ENV ~= nil then
+       client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
+     else
+       client.config.settings.python.pythonPath = "/home/alex/.pyenv/shims/python"
+     end
+   end,
 })
 
-lsp.lua_ls.setup{
-    on_attach=on_attach,
-    settings = {
-        Lua = {
-            diagnostics = {
-                globals = { "vim" }
-            }
-        }
-    }
-}
+vim.lsp.config("lua_ls", {
+   before_init = require("neodev.lsp").before_init,
+   settings = {
+     Lua = {
+       diagnostics = { globals = { "vim" } },
+     },
+   },
+})
 
+vim.lsp.enable({ "gopls", "clangd", "ccls", "pyright", "lua_ls" })
 
 local function compare_to_clipboard()
   local ftype = vim.api.nvim_eval("&filetype")
@@ -150,3 +196,12 @@ local function compare_to_clipboard()
 end
 
 vim.keymap.set('v', '<C-d>', compare_to_clipboard)
+
+require('lsp_signature').setup({
+  bind = true,
+  floating_window = true,
+  hint_enable = false,          -- если не хочешь inline-хинтов
+  toggle_key = nil,
+  hi_parameter = 'IncSearch',   -- подсветка текущего аргумента
+  zindex = 50,
+})
