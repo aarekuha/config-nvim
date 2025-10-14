@@ -31,5 +31,6 @@
         "/tmp/lua-language-server.e5G0/meta/089f9729",
         "/tmp/lua-language-server.OGG3/meta/089f9729"
     ],
-    "workspace.checkThirdParty": false
+    "workspace.checkThirdParty": false,
+    "diagnostics.globals": ["vim"]
 }

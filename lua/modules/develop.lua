@@ -50,7 +50,7 @@ local function goto_def_unique()
     if #locs == 1 then
       vim.lsp.util.show_document(locs[1], enc, { focus = true })
     else
-      vim.lsp.util.set_qflist(vim.lsp.util.locations_to_items(locs, enc))
+      vim.fn.setqflist(vim.lsp.util.locations_to_items(locs, enc))
       vim.cmd("copen")
     end
   end)
@@ -153,7 +153,19 @@ vim.lsp.config("*", {
 vim.lsp.config("clangd", {})
 vim.lsp.config("ccls", {})
 
+-- Только для pyright добавляем объявление динамического наблюдения
+local py_caps = require("cmp_nvim_lsp").default_capabilities()
+py_caps.workspace = py_caps.workspace or {}
+py_caps.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
+py_caps.workspace.fileOperations = {
+  dynamicRegistration = true,
+  willRename = true, didRename = true,
+  willCreate = true, didCreate = true,
+  willDelete = true, didDelete = true,
+}
+
 vim.lsp.config("pyright", {
+   capabilities = py_caps,
    flags = { debounce_text_changes = 150 },
    on_init = function(client)
      client.config.settings = client.config.settings or {}
@@ -175,7 +187,7 @@ vim.lsp.config("lua_ls", {
    },
 })
 
-vim.lsp.enable({ "gopls", "clangd", "ccls", "pyright", "lua_ls" })
+vim.lsp.enable({ "clangd", "pyright", "lua_ls" })
 
 local function compare_to_clipboard()
   local ftype = vim.api.nvim_eval("&filetype")
@@ -187,7 +199,7 @@ local function compare_to_clipboard()
     setlocal buftype=nowrite
     set filetype=%s
     diffthis
-    execute "normal! \<C-w>\<C-w>"
+    execute "normal! <C-w><C-w>"
     enew
     set filetype=%s
     normal! "xP
@@ -205,3 +217,64 @@ require('lsp_signature').setup({
   hi_parameter = 'IncSearch',   -- подсветка текущего аргумента
   zindex = 50,
 })
+--
+-- === Два независимых "resume": для live_grep и find_files ===
+local tb = require('telescope.builtin')
+
+-- Память запроса только в RAM на текущую сессию
+local hist = {
+  live_grep  = nil,
+  find_files = nil,
+}
+
+-- безопасный вызов live_grep_args если есть, иначе live_grep
+local function call_live_grep(opts)
+  local ok, ext = pcall(function() return require('telescope').extensions.live_grep_args end)
+  if ok and ext and ext.live_grep_args then
+    ext.live_grep_args(opts or {})
+  else
+    tb.live_grep(opts or {})
+  end
+end
+
+-- Обёртка: открыть пикер, подставить прошлый запрос, запомнить новый при Enter/закрытии
+local function open_with_history(kind, picker_fn, opts)
+  local actions = require('telescope.actions')
+  local action_state = require('telescope.actions.state')
+  opts = opts or {}
+  opts.default_text = hist[kind] or ""
+
+  opts.attach_mappings = function(_, map)
+    local function save_and(fn)
+      return function(prompt_bufnr)
+        hist[kind] = action_state.get_current_line()
+        return fn(prompt_bufnr)
+      end
+    end
+    -- сохраняем и при выборе, и при выходе
+    map('i', '<CR>',  save_and(actions.select_default))
+    map('n', '<CR>',  save_and(actions.select_default))
+    map('i', '<Esc>', save_and(actions.close))
+    map('n', 'q',     save_and(actions.close))
+    return true
+  end
+
+  picker_fn(opts)
+end
+
+-- Ctrl-f: первый раз — чистый live_grep; дальше — с прошлым запросом (как «resume»)
+vim.keymap.set('n', '<C-f>', function()
+  open_with_history('live_grep', function(o) call_live_grep(o) end, {
+    -- добавь свои дефолтные флаги, если нужны
+    additional_args = function() return { "--hidden" } end,
+  })
+end, { desc = 'Smart live_grep с автоподстановкой прошлого запроса' })
+
+-- Ctrl-t: аналогично для find_files
+vim.keymap.set('n', '<C-t>', function()
+  open_with_history('find_files', tb.find_files, {
+    -- пример: скрытые файлы и не уважать .gitignore
+    hidden = true,
+    no_ignore = true,
+  })
+end, { desc = 'Smart find_files с автоподстановкой прошлого запроса' })

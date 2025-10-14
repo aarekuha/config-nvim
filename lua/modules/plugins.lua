@@ -49,6 +49,35 @@ return packer.startup(function(use)
         }
     }  -- замена fzf, ack и многих еще =)
     use {
+      "nvim-telescope/telescope-live-grep-args.nvim",
+      config = function()
+        require("telescope").load_extension("live_grep_args")
+      end
+    }
+    use {
+        'nvim-telescope/telescope-ui-select.nvim',
+        config = function()
+          local actions = require("telescope.actions")
+          require("telescope").setup({
+            defaults = {
+              mappings = {
+                i = {
+                  ["<C-k>"] = actions.move_selection_previous,
+                  ["<C-j>"] = actions.move_selection_next,
+                }
+              }
+            },
+            extensions = {
+              ["ui-select"] = {
+                require("telescope.themes").get_dropdown {
+                }
+              }
+            }
+          })
+          require("telescope").load_extension("ui-select")
+        end
+    }
+    use {
         'nvim-lualine/lualine.nvim',
         requires = { 'kyazdani42/nvim-web-devicons', opt = true }
     }
@@ -74,6 +103,7 @@ return packer.startup(function(use)
     use 'Xuyuanp/nerdtree-git-plugin'
     use 'ryanoasis/vim-devicons'
     use 'mg979/vim-visual-multi'  -- мультикурсоры
+    use 'iamcco/markdown-preview.nvim'
     use 'puremourning/vimspector'
     use 'mbbill/undotree'
     use 'folke/neodev.nvim'
@@ -84,6 +114,8 @@ return packer.startup(function(use)
     use 'petobens/poet-v'
     use 'aklt/plantuml-syntax'
     use 'weirongxu/plantuml-previewer.vim'
+    use 'previm/previm'
+    use 'tyru/open-browser.vim'
     use 'backdround/neowords.nvim'
 
     -- Required plugins

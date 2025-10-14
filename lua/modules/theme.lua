@@ -1,3 +1,5 @@
+local vim = _G.vim
+
 require("gruvbox").setup({
   undercurl = true,
   underline = true,
