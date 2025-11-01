@@ -53,19 +53,21 @@ vim.cmd([[
 ]])
 
 -- Git figitive
-keymap('n', '<leader>gg', ':Git<CR>', default_opts)
-keymap('n', '<leader>пп', ':Git<CR>', default_opts)
+keymap('n', '<leader>gg', ':DiffviewOpen<CR>', default_opts)
+keymap('n', '<leader>пп', ':DiffviewOpen<CR>', default_opts)
 keymap('n', '<leader>gb', ':Git blame<CR>', default_opts)
 keymap('n', '<leader>пи', ':Git blame<CR>', default_opts)
-keymap('n', '<leader>gd', ':Gvdiff<CR>', default_opts)
-keymap('n', '<leader>пв', ':Gvdiff<CR>', default_opts)
-keymap('n', '<leader>gl', ':Gclog<CR>', default_opts)
-keymap('n', '<leader>пд', ':Gclog<CR>', default_opts)
-keymap('n', '<leader>gc', ':Git commit -m ""<LEFT>', default_opts)
-keymap('n', '<leader>пс', ':Git commit -m ""<LEFT>', default_opts)
-keymap('n', '<leader>gp', ':Git push<CR>', default_opts)
-keymap('n', '<leader>пз', ':Git push<CR>', default_opts)
+keymap('n', '<leader>gd', ':DiffviewFileHistory<CR>', default_opts)
+keymap('n', '<leader>пв', ':DiffviewFileHistory<CR>', default_opts)
 keymap('n', '<leader>gs', ':Telescope git_stash<CR>', default_opts)
 keymap('n', '<leader>пы', ':Telescope git_stash<CR>', default_opts)
 keymap('n', '<C-b>', ':Telescope git_branches<CR>', default_opts)
 keymap('n', '<C-и>', ':Telescope git_branches<CR>', default_opts)
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "DiffviewFiles", "DiffviewFileHistory" },
+  callback = function(args)
+    local opts = { buffer = args.buf, silent = true, nowait = true }
+    vim.keymap.set({ "n", "v" }, "<Esc>", "<cmd>DiffviewClose<CR>", opts)
+  end,
+})

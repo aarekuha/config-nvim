@@ -100,6 +100,11 @@ _G.packer_plugins = {
     path = "/home/alex/.local/share/nvim/site/pack/packer/start/cmp_luasnip",
     url = "https://github.com/saadparwaiz1/cmp_luasnip"
   },
+  ["diffview.nvim"] = {
+    loaded = true,
+    path = "/home/alex/.local/share/nvim/site/pack/packer/start/diffview.nvim",
+    url = "https://github.com/sindrets/diffview.nvim"
+  },
   ["gruvbox.nvim"] = {
     loaded = true,
     path = "/home/alex/.local/share/nvim/site/pack/packer/start/gruvbox.nvim",
@@ -176,10 +181,9 @@ _G.packer_plugins = {
     url = "https://github.com/nvim-treesitter/nvim-treesitter"
   },
   ["nvim-web-devicons"] = {
-    loaded = false,
-    needs_bufread = false,
-    path = "/home/alex/.local/share/nvim/site/pack/packer/opt/nvim-web-devicons",
-    url = "https://github.com/kyazdani42/nvim-web-devicons"
+    loaded = true,
+    path = "/home/alex/.local/share/nvim/site/pack/packer/start/nvim-web-devicons",
+    url = "https://github.com/nvim-tree/nvim-web-devicons"
   },
   ["open-browser.vim"] = {
     loaded = true,
@@ -238,7 +242,7 @@ _G.packer_plugins = {
     url = "https://github.com/nvim-telescope/telescope-live-grep-args.nvim"
   },
   ["telescope-ui-select.nvim"] = {
-    config = { "\27LJ\2\n¤\3\0\0\t\0\21\1%6\0\0\0'\2\1\0B\0\2\0026\1\0\0'\3\2\0B\1\2\0029\1\3\0015\3\r\0005\4\v\0005\5\t\0005\6\5\0009\a\4\0=\a\6\0069\a\a\0=\a\b\6=\6\n\5=\5\f\4=\4\14\0035\4\17\0004\5\3\0006\6\0\0'\b\15\0B\6\2\0029\6\16\0064\b\0\0B\6\2\0?\6\0\0=\5\18\4=\4\19\3B\1\2\0016\1\0\0'\3\2\0B\1\2\0029\1\20\1'\3\18\0B\1\2\1K\0\1\0\19load_extension\15extensions\14ui-select\1\0\1\14ui-select\0\17get_dropdown\21telescope.themes\rdefaults\1\0\2\rdefaults\0\15extensions\0\rmappings\1\0\1\rmappings\0\6i\1\0\1\6i\0\n<C-j>\24move_selection_next\n<C-k>\1\0\2\n<C-j>\0\n<C-k>\0\28move_selection_previous\nsetup\14telescope\22telescope.actions\frequire\3€€À™\4\0" },
+    config = { "\27LJ\2\n¤\3\0\0\t\0\21\1%6\0\0\0'\2\1\0B\0\2\0026\1\0\0'\3\2\0B\1\2\0029\1\3\0015\3\r\0005\4\v\0005\5\t\0005\6\5\0009\a\4\0=\a\6\0069\a\a\0=\a\b\6=\6\n\5=\5\f\4=\4\14\0035\4\17\0004\5\3\0006\6\0\0'\b\15\0B\6\2\0029\6\16\0064\b\0\0B\6\2\0?\6\0\0=\5\18\4=\4\19\3B\1\2\0016\1\0\0'\3\2\0B\1\2\0029\1\20\1'\3\18\0B\1\2\1K\0\1\0\19load_extension\15extensions\14ui-select\1\0\1\14ui-select\0\17get_dropdown\21telescope.themes\rdefaults\1\0\2\15extensions\0\rdefaults\0\rmappings\1\0\1\rmappings\0\6i\1\0\1\6i\0\n<C-j>\24move_selection_next\n<C-k>\1\0\2\n<C-k>\0\n<C-j>\0\28move_selection_previous\nsetup\14telescope\22telescope.actions\frequire\3€€À™\4\0" },
     loaded = true,
     path = "/home/alex/.local/share/nvim/site/pack/packer/start/telescope-ui-select.nvim",
     url = "https://github.com/nvim-telescope/telescope-ui-select.nvim"
@@ -301,10 +305,6 @@ _G.packer_plugins = {
 }
 
 time([[Defining packer_plugins]], false)
--- Config for: telescope-ui-select.nvim
-time([[Config for telescope-ui-select.nvim]], true)
-try_loadstring("\27LJ\2\n¤\3\0\0\t\0\21\1%6\0\0\0'\2\1\0B\0\2\0026\1\0\0'\3\2\0B\1\2\0029\1\3\0015\3\r\0005\4\v\0005\5\t\0005\6\5\0009\a\4\0=\a\6\0069\a\a\0=\a\b\6=\6\n\5=\5\f\4=\4\14\0035\4\17\0004\5\3\0006\6\0\0'\b\15\0B\6\2\0029\6\16\0064\b\0\0B\6\2\0?\6\0\0=\5\18\4=\4\19\3B\1\2\0016\1\0\0'\3\2\0B\1\2\0029\1\20\1'\3\18\0B\1\2\1K\0\1\0\19load_extension\15extensions\14ui-select\1\0\1\14ui-select\0\17get_dropdown\21telescope.themes\rdefaults\1\0\2\rdefaults\0\15extensions\0\rmappings\1\0\1\rmappings\0\6i\1\0\1\6i\0\n<C-j>\24move_selection_next\n<C-k>\1\0\2\n<C-j>\0\n<C-k>\0\28move_selection_previous\nsetup\14telescope\22telescope.actions\frequire\3€€À™\4\0", "config", "telescope-ui-select.nvim")
-time([[Config for telescope-ui-select.nvim]], false)
 -- Config for: LuaSnip
 time([[Config for LuaSnip]], true)
 try_loadstring("\27LJ\2\n-\0\0\3\0\2\0\0046\0\0\0'\2\1\0B\0\2\1K\0\1\0\18snippets.init\frequire\0", "config", "LuaSnip")
@@ -313,6 +313,10 @@ time([[Config for LuaSnip]], false)
 time([[Config for telescope-live-grep-args.nvim]], true)
 try_loadstring("\27LJ\2\nS\0\0\3\0\4\0\a6\0\0\0'\2\1\0B\0\2\0029\0\2\0'\2\3\0B\0\2\1K\0\1\0\19live_grep_args\19load_extension\14telescope\frequire\0", "config", "telescope-live-grep-args.nvim")
 time([[Config for telescope-live-grep-args.nvim]], false)
+-- Config for: telescope-ui-select.nvim
+time([[Config for telescope-ui-select.nvim]], true)
+try_loadstring("\27LJ\2\n¤\3\0\0\t\0\21\1%6\0\0\0'\2\1\0B\0\2\0026\1\0\0'\3\2\0B\1\2\0029\1\3\0015\3\r\0005\4\v\0005\5\t\0005\6\5\0009\a\4\0=\a\6\0069\a\a\0=\a\b\6=\6\n\5=\5\f\4=\4\14\0035\4\17\0004\5\3\0006\6\0\0'\b\15\0B\6\2\0029\6\16\0064\b\0\0B\6\2\0?\6\0\0=\5\18\4=\4\19\3B\1\2\0016\1\0\0'\3\2\0B\1\2\0029\1\20\1'\3\18\0B\1\2\1K\0\1\0\19load_extension\15extensions\14ui-select\1\0\1\14ui-select\0\17get_dropdown\21telescope.themes\rdefaults\1\0\2\15extensions\0\rdefaults\0\rmappings\1\0\1\rmappings\0\6i\1\0\1\6i\0\n<C-j>\24move_selection_next\n<C-k>\1\0\2\n<C-k>\0\n<C-j>\0\28move_selection_previous\nsetup\14telescope\22telescope.actions\frequire\3€€À™\4\0", "config", "telescope-ui-select.nvim")
+time([[Config for telescope-ui-select.nvim]], false)
 
 _G._packer.inside_compile = false
 if _G._packer.needs_bufread == true then

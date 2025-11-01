@@ -77,10 +77,7 @@ return packer.startup(function(use)
           require("telescope").load_extension("ui-select")
         end
     }
-    use {
-        'nvim-lualine/lualine.nvim',
-        requires = { 'kyazdani42/nvim-web-devicons', opt = true }
-    }
+    use { 'nvim-lualine/lualine.nvim' }
     -- use 'nvim-lua/completion-nvim'
     use 'preservim/tagbar'  -- через ctags выводит стуктуру текущего файла (аналог vista)
     use 'phaazon/hop.nvim'  -- прыжки по тексту (аналог easymotion)
@@ -124,4 +121,6 @@ return packer.startup(function(use)
 
     use 'williamboman/mason.nvim'
     use 'williamboman/mason-lspconfig.nvim'
+    use 'sindrets/diffview.nvim'
+    use 'nvim-tree/nvim-web-devicons'
 end)

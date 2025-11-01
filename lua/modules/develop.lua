@@ -1,27 +1,5 @@
 local vim = _G.vim
 
-require("mason").setup()
-
-require("mason-lspconfig").setup({
-  ensure_installed = { "lua_ls", "pyright", "ts_ls" }, -- свои сервера сюда
-  automatic_installation = true,
-  handlers = {
-    -- дефолт для всех серверов
-    function(server)
-      require("lspconfig")[server].setup({})
-    end,
-
-    -- пример точечной настройки
-    lua_ls = function()
-      require("lspconfig").lua_ls.setup({
-        settings = {
-          Lua = { diagnostics = { globals = { "vim" } } }
-        }
-      })
-    end,
-  },
-})
-
 local function _unique_locs(locs)
   local seen, out = {}, {}
   for _, loc in ipairs(locs) do
@@ -146,49 +124,6 @@ cmp.setup({
 require("Comment").setup({})
 require("hop").setup { keys = "ghfjdksla" }
 
-vim.lsp.config("*", {
-   capabilities = require("cmp_nvim_lsp").default_capabilities(),
-})
-
-vim.lsp.config("clangd", {})
-vim.lsp.config("ccls", {})
-
--- Только для pyright добавляем объявление динамического наблюдения
-local py_caps = require("cmp_nvim_lsp").default_capabilities()
-py_caps.workspace = py_caps.workspace or {}
-py_caps.workspace.didChangeWatchedFiles = { dynamicRegistration = true }
-py_caps.workspace.fileOperations = {
-  dynamicRegistration = true,
-  willRename = true, didRename = true,
-  willCreate = true, didCreate = true,
-  willDelete = true, didDelete = true,
-}
-
-vim.lsp.config("pyright", {
-   capabilities = py_caps,
-   flags = { debounce_text_changes = 150 },
-   on_init = function(client)
-     client.config.settings = client.config.settings or {}
-     client.config.settings.python = client.config.settings.python or {}
-     if vim.env.VIRTUAL_ENV ~= nil then
-       client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
-     else
-       client.config.settings.python.pythonPath = "/home/alex/.pyenv/shims/python"
-     end
-   end,
-})
-
-vim.lsp.config("lua_ls", {
-   before_init = require("neodev.lsp").before_init,
-   settings = {
-     Lua = {
-       diagnostics = { globals = { "vim" } },
-     },
-   },
-})
-
-vim.lsp.enable({ "clangd", "pyright", "lua_ls" })
-
 local function compare_to_clipboard()
   local ftype = vim.api.nvim_eval("&filetype")
   vim.cmd(string.format([[
@@ -278,3 +213,81 @@ vim.keymap.set('n', '<C-t>', function()
     no_ignore = true,
   })
 end, { desc = 'Smart find_files с автоподстановкой прошлого запроса' })
+
+local caps = require("cmp_nvim_lsp").default_capabilities()
+-- душим динамические вотчеры и семантические токены глобально
+caps.workspace = caps.workspace or {}
+caps.workspace.didChangeWatchedFiles = { dynamicRegistration = false }
+caps.textDocument = caps.textDocument or {}
+caps.textDocument.semanticTokens = { dynamicRegistration = false }
+
+require("mason").setup()
+
+require("mason-lspconfig").setup{
+  ensure_installed = { "lua_ls", "pyright", "ts_ls" },
+  automatic_installation = true,
+  handlers = {
+    -- дефолт для всех
+    function(server)
+      require("lspconfig")[server].setup{
+        capabilities = caps,
+      }
+    end,
+
+    lua_ls = function()
+      require("lspconfig").lua_ls.setup{
+        capabilities = caps,
+        settings = { Lua = { diagnostics = { globals = { "vim" } } } },
+        before_init = require("neodev.lsp").before_init,
+      }
+    end,
+
+    pyright = function()
+      require("lspconfig").pyright.setup{
+        capabilities = caps,
+        flags = { debounce_text_changes = 150 },
+        settings = {
+          python = {
+            analysis = {
+              diagnosticMode = "openFilesOnly",
+              autoSearchPaths = true,
+              useLibraryCodeForTypes = true,
+            }
+          }
+        },
+        on_init = function(client)
+          client.config.settings = client.config.settings or {}
+          client.config.settings.python = client.config.settings.python or {}
+          if vim.env.VIRTUAL_ENV ~= nil then
+            client.config.settings.python.pythonPath = vim.env.VIRTUAL_ENV .. "/bin/python"
+          else
+            client.config.settings.python.pythonPath = "/home/alex/.pyenv/shims/python"
+          end
+        end,
+      }
+    end,
+  },
+}
+
+local function detach_lsp(buf)
+  for _, c in pairs(vim.lsp.get_clients { bufnr = buf }) do
+    pcall(vim.lsp.buf_detach_client, buf, c.id)
+  end
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "DiffviewFiles", "DiffviewFileHistory", "diff" },
+  callback = function(args)
+    vim.b[args.buf].lsp_ignore = true
+    detach_lsp(args.buf)
+  end,
+})
+
+require("nvim-treesitter.configs").setup({
+  highlight = {
+    enable = true,
+    additional_vim_regex_highlighting = false,
+  },
+})
+
+vim.g.hg_cmd = ''
