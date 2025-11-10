@@ -42,7 +42,15 @@ local plugins = {
   { "ryanoasis/vim-devicons" },
   { "mg979/vim-visual-multi" },
   { "iamcco/markdown-preview.nvim" },
-  { "puremourning/vimspector" },
+  {
+    "puremourning/vimspector",
+    init = function()
+      require("modules.vimspector").init()
+    end,
+    config = function()
+      require("modules.vimspector").setup()
+    end,
+  },
   { "mbbill/undotree" },
   { "folke/neodev.nvim" },
   { "ray-x/lsp_signature.nvim" },
